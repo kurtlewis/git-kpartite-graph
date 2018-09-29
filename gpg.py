@@ -20,21 +20,21 @@ def buildGraph(repoUrl):
     # iterate through the log and parse it to build graph
     # output = str(subprocess.check_output(['git', 'log', '--name-only', '--reverse', '--pretty=format:"COMMIT_EMAIL: %ae"'], cwd=folderName))
     email = None
-    emailRe = re.compile('COMMIT_EMAIL (.*)\Z')
+    emailRe = re.compile('COMMIT_EMAIL: (.*)\Z')
     fileRe = re.compile('(.+)\Z')
     for line in str(subprocess.check_output(['git', 'log', '--name-only',
                                              '--reverse',
-                                             '--pretty=format:"COMMIT_EMAIL: %ae"'],
+                                             '--pretty=format:COMMIT_EMAIL: %ae'],
                                             cwd=folderName)).split('\\n'):
         emailMatch = emailRe.match(line)
         if emailMatch is not None:
             # update the email and exit the loop
-            email = emailMatch.group(0)
+            email = emailMatch.group(1)
             graph.add_node(email)
-        else:
+        elif email is not None:
             fileMatch = fileRe.match(line)
             if fileMatch is not None:
-                file = fileMatch.group(0)
+                file = fileMatch.group(1)
                 # insert into the graph, or update existing edge
                 # networkx ignores already existing nodes and edges
                 # TODO - add weighting by number of commits
