@@ -52,16 +52,19 @@ def buildGraph(repoUrl):
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--build', action='store_true',
+    argparser.add_argument('--build', nargs=1,
                            help='Build the graph from a input piped git log')
+    argparser.add_argument('--draw', action='store_true',
+                           help='Draw the loaded graph.')
     args = argparser.parse_args()
-    if args.build:
+    if args.build is not None:
         # build the graph
-        buildGraph("https://github.com/kurtlewis/ceas-ambassadors-website")
+        buildGraph(args.build[0])
 
-    # draw the graph
-    sets = nx.algorithms.bipartite.sets(graph)
-    plt.subplot(121)
-    pos = nx.bipartite_layout(graph, sets[0])
-    nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
-    plt.show()
+    if args.draw:
+        # draw the graph
+        sets = nx.algorithms.bipartite.sets(graph)
+        plt.subplot(121)
+        pos = nx.bipartite_layout(graph, sets[0])
+        nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
+        plt.show()
