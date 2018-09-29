@@ -52,19 +52,27 @@ def buildGraph(repoUrl):
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
+    argparser.add_argument('dims', nargs=2, type=int)
     argparser.add_argument('--build', nargs=1,
                            help='Build the graph from a input piped git log')
     argparser.add_argument('--draw', action='store_true',
                            help='Draw the loaded graph.')
+    argparser.add_argument('--save', nargs=1,
+                           help='Save the image. <filename>')
     args = argparser.parse_args()
     if args.build is not None:
         # build the graph
         buildGraph(args.build[0])
 
+    # remove the isolates if they exist
+    graph.remove_nodes_from(list(nx.algorithms.isolates(graph)))
+    # draw the graph
+    sets = nx.algorithms.bipartite.sets(graph)
+    plt.figure(1, figsize=(args.dims[0], args.dims[1]))
+    plt.subplot(121)
+    pos = nx.bipartite_layout(graph, sets[0])
+    nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
     if args.draw:
-        # draw the graph
-        sets = nx.algorithms.bipartite.sets(graph)
-        plt.subplot(121)
-        pos = nx.bipartite_layout(graph, sets[0])
-        nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
         plt.show()
+    if args.save is not None:
+        plt.savefig(args.save[0], bbox_inches='tight')
