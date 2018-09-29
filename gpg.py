@@ -7,6 +7,7 @@ import argparse
 import subprocess
 import shutil
 import re
+import matplotlib.pyplot as plt
 
 graph = nx.Graph()
 
@@ -57,3 +58,10 @@ if __name__ == '__main__':
     if args.build:
         # build the graph
         buildGraph("https://github.com/kurtlewis/ceas-ambassadors-website")
+
+    # draw the graph
+    sets = nx.algorithms.bipartite.sets(graph)
+    plt.subplot(121)
+    pos = nx.bipartite_layout(graph, sets[0])
+    nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
+    plt.show()
