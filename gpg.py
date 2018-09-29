@@ -52,7 +52,10 @@ def buildGraph(repoUrl):
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('dims', nargs=2, type=int)
+    argparser.add_argument('dim1', type=int,
+                           help='X dimension of ouptut in inches')
+    argparser.add_argument('dim2', type=int,
+                           help='Y dimension of output in inches')
     argparser.add_argument('--build', nargs=1,
                            help='Build the graph from a input piped git log')
     argparser.add_argument('--draw', action='store_true',
@@ -66,12 +69,16 @@ if __name__ == '__main__':
 
     # remove the isolates if they exist
     graph.remove_nodes_from(list(nx.algorithms.isolates(graph)))
+
+    # print(nx.algorithms.bipartite.average_clustering(graph))
     # draw the graph
     sets = nx.algorithms.bipartite.sets(graph)
-    plt.figure(1, figsize=(args.dims[0], args.dims[1]))
+    proj = nx.algorithms.bipartite.projected_graph(graph, sets[1])
+    plt.figure(1, figsize=(args.dim1, args.dim2))
     plt.subplot(121)
     pos = nx.bipartite_layout(graph, sets[0])
-    nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
+    #nx.draw(graph, with_labels=True, font_weight='bold', pos=pos)
+    nx.draw(proj, with_labels=True, font_weight='bold')
     if args.draw:
         plt.show()
     if args.save is not None:
